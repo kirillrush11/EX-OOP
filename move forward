@@ -1,0 +1,57 @@
+#include <iostream>
+
+using namespace std;
+//универсальная ссылка на основе преобразования амперсантов &+&& = &
+//template <typename T>
+//void foo(T&& val){
+//}
+//
+
+void foo(int&){cout << "int&" << endl;}
+void foo(int&&){cout << "int&&" << endl;}
+
+template <typename T>
+std::remove_reference<T>&& move(T&& ptr){
+    return static_cast<std::remove_reference<T>&&>(ptr);
+} //std::move
+
+template <typename T>
+T&& forward(std::remove_reference<T>& ptr){ // std remoref для того чтобы обрабатывать ошибку с неуказанием типа в форварде
+    return static_cast<T&&>(ptr);
+}
+
+template <typename T> // перегрузка функции форвард
+T&& forward(std::remove_reference<T>&& ptr){
+    static_assert(!std::is_lvalue_reference_v<T>);
+    return static_cast<T&&>(ptr);
+}
+
+class BigData{
+public:
+    BigData() = default;
+    BigData(const BigData& other){};
+};
+
+class SomeClass{
+    BigData* data;
+public:
+    SomeClass() : data(new BigData){};
+    SomeClass(const SomeClass &other) {data = new BigData(*other.data);};
+    SomeClass (SomeClass&& other) : data(other.data) {other.data = nullptr;};
+    ~SomeClass(){ delete data; };
+};
+
+class B{
+    SomeClass some;
+public:
+    B(const SomeClass & other) : some(other){};
+    B (SomeClass && other) : some(std::move(other)){};
+};
+
+int main()
+{
+    return 0;
+}
+
+
+
