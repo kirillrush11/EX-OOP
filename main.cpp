@@ -2,63 +2,42 @@
 
 using namespace std;
 
-class Enemy{};
-class Soldier : public Enemy{};
-class Monster : public Enemy{};
-
-class StupidMonster : public Monster{};
-class StudpidSoldier : public Soldier{};
-
-class BadMonster : public Monster{};
-class BadSoldier : public Soldier{};
-
-class AbstractEnemyFactory{
-public:
-    virtual Soldier* MakeSoldier() = 0;
-    virtual Monster* MakeMonster() = 0;
-    virtual ~AbstractEnemyFactory() = 0;
-};
-
-class EasyLevelFactory : public AbstractEnemyFactory{
-public:
-    Soldier* MakeSoldier() override{
-        return new StudpidSoldier;
-    }
-    Monster* MakeMonster() override{
-        return new StupidMonster;
-    }
-};
-
-class HardLevelFactory : public AbstractEnemyFactory{
-public:
-    Soldier* MakeSoldier() override{
-        return new BadSoldier;
-    }
-    Monster* MakeMonster() override{
-        return new BadMonster;
-    }
-};
-
-class GameApp{
-public:
-    void selectLevel(bool easy){
-        if (easy){
-            factory = new EasyLevelFactory;
-        }else{
-            factory = new HardLevelFactory;
-        }
-    }
-
-    void spawnEnemies(){
-        Soldier* s = factory->MakeSoldier();
-        Monster* m = factory->MakeMonster();
-    }
+class DataBase{
 private:
-    AbstractEnemyFactory* factory = nullptr;
+    DataBase() {
+        cout << "Connection to database...";
+    }
+    static DataBase* connector;
+    string data;
+public:
+    DataBase(const DataBase &) = delete;
+    void operator=(const DataBase &) = delete;
+
+    static DataBase* getConnection(){
+        if (connector == nullptr){
+            connector = new DataBase;
+        }
+        return connector;
+    }
+
+    string selectData() const{
+        return data;
+    }
+
+    void insertData(string tmp){
+        cout << tmp << endl;
+        data = tmp;
+    }
 };
 
+DataBase* DataBase::connector = nullptr;
 
 int main()
 {
+    DataBase::getConnection()->insertData("12123123");
+    DataBase::getConnection()->insertData("1");
+    DataBase::getConnection()->insertData("12");
     return 0;
+
+    cout << ":" << DataBase::getConnection()->selectData() << endl;
 }
