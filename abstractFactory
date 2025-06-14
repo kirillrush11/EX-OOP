@@ -1,0 +1,67 @@
+#include <iostream>
+
+using namespace std;
+
+class Enemy{};
+class Soldier : public Enemy{};
+class Monster : public Enemy{};
+
+class StupidMonster : public Monster{};
+class StudpidSoldier : public Soldier{};
+
+class BadMonster : public Monster{};
+class BadSoldier : public Soldier{};
+
+class AbstractEnemyFactory{
+public:
+    virtual Soldier* MakeSoldier() = 0;
+    virtual Monster* MakeMonster() = 0;
+    virtual ~AbstractEnemyFactory() = 0;
+};
+
+class EasyLevelFactory : public AbstractEnemyFactory{
+public:
+    Soldier* MakeSoldier() override{
+        return new StudpidSoldier;
+    }
+    Monster* MakeMonster() override{
+        return new StupidMonster;
+    }
+};
+
+class HardLevelFactory : public AbstractEnemyFactory{
+public:
+    Soldier* MakeSoldier() override{
+        return new BadSoldier;
+    }
+    Monster* MakeMonster() override{
+        return new BadMonster;
+    }
+};
+
+class GameApp{
+public:
+    void selectLevel(bool easy){
+        if (easy){
+            factory = new EasyLevelFactory;
+        }else{
+            factory = new HardLevelFactory;
+        }
+    }
+
+    void spawnEnemies(){
+        Soldier* s = factory->MakeSoldier();
+        Monster* m = factory->MakeMonster();
+    }
+private:
+    AbstractEnemyFactory* factory = nullptr;
+};
+
+
+int main()
+{
+    GameApp game;
+    game.selectLevel(true);
+    game.spawnEnemies();
+    return 0;
+}
